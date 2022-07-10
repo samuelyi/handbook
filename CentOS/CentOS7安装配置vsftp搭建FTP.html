@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CentOS7安装配置vsftp搭建FTP handbook</title>
+    <meta name="description" content="安装配置vsftpd做FTP服务，我们的项目应用使用git管理进行迭代，公共文件软件存储使用开源网盘Seafile来管理，基本够用。想不到FTP的使用的场景，感觉它好像老去了，虽然现在基本没有用到这个工具，刚好公司公司刷一个硬件需要使用FT">
+    <meta name="keywords" content="handbook,笔记,搜集,摘录,实践,tutorial">
+    <link rel="stylesheet" type="text/css" href="../css/main.css?v=1.21.9">
+    <link rel="stylesheet" type="text/css" href="../css/tocbot.css?v=1.21.9">
+    <link rel="stylesheet" type="text/css" href="../css/media.css?v=1.21.9">
+    <link rel="stylesheet" type="text/css" href="../css/sidebar.css?v=1.21.9">
+    <link rel="stylesheet" type="text/css" href="../css/copy.css?v=1.21.9">
+    <link rel="stylesheet" type="text/css" href="../css/demo-preview.css?v=1.21.9">
+    <link rel="icon" href="data:image/png;base64,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" type="image/x-icon">
+    <script src="../js/copy.js?v=1.21.9"></script>
+    <script src="../js/dark-mode.js?v=1.21.9"></script>
+    <script src="../js/markdown-style.js?v=1.21.9"></script>
+  </head>
+  <body id="idoctotop"><a href="#idoctotop" class="gototop">top</a>
+    <header class="header">
+      <article class="inner warpper"><a class="logo" href="../index.html"><img alt="handbook logo" src="data:image/png;base64,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">
+<span class="title">handbook</span></a>
+        <div class="content">
+          <ul class="menu">
+            <li><a href="../index.html" target="" class="">Home</a></li>
+            <li><a href="../awesome.html" target="" class="">Awesome</a></li>
+            <li><a href="https://jaywcjlove.gitee.io/handbook/" target="__blank" class="">🇨🇳</a></li>
+          </ul><a href="https://github.com/jaywcjlove/handbook" target="_blank" rel="noopener noreferrer" title="Github" name="Github" class="github"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+            </svg></a>
+          <dark-mode permanent=""></dark-mode>
+        </div>
+      </article>
+    </header>
+    <div class="warpper-content warpper sidebar">
+      <div class="sidebar-border">
+        <aside class="sidebar" role="navigation">
+          <div>
+            <label>JavaScript</label>
+            <a href="../JavaScript/RegExp.html" class="">一些正则表达式随记</a>
+            <a href="../JavaScript/SDK.html" class="">开源 JS 插件和库</a>
+            <a href="../JavaScript/nodejs.html" class="">NodeJS 包搜集</a>
+            <a href="../JavaScript/思维导图来学习 Javascript 基础知识.html" class="">基础知识(思维导图)</a>
+            <label>Redis</label>
+            <a href="../Redis/index.html" class="">快速入门 Redis</a>
+            <label>Android</label>
+            <a href="../Android/react-native.html" class="">React Native Android 环境搭建</a>
+            <label>CentOS</label>
+            <a href="CentOS.html" class="">CentOS 常用命令</a>
+            <a href="CentOS7网络配置.html" class="">CentOS7 网络配置</a>
+            <a href="常用基础命令.html" class="">常用基础命令</a>
+            <a href="CentOS7安装KVM虚拟机详解.html" class="">安装 KVM 虚拟机详解</a>
+            <a href="CentOS7更换yum软件镜像源.html" class="">更换 yum 软件镜像源</a>
+            <a href="CentOS7安装维护Gitlab.html" class="">安装维护 GitLab</a>
+            <a href="CentOS7安装配置vsftp搭建FTP.html" class="active">安装搭建 FTP</a>
+            <a href="Centos7安装编译Node.html" class="">Centos7安装编译Node</a>
+            <a href="Elasticsearch安装维护.html" class="">Elasticsearch安装维护</a>
+            <a href="Frp内网穿透搭建.html" class="">Frp内网穿透搭建</a>
+            <a href="Linux添加、删除用户和用户组.html" class="">Linux添加、删除用户和用户组</a>
+            <a href="Mac使用NFS连接CentOS上的共享文件夹.html" class="">Mac使用NFS连接CentOS上的共享文件夹</a>
+            <a href="Mac下制作CentOS7启动盘.html" class="">Mac下制作CentOS7启动盘</a>
+            <a href="Python2升级到Python3.html" class="">Python2 升级到 Python3</a>
+            <a href="Rocket.Chat.html" class="">Rocket.Chat</a>
+            <a href="Ruby安装.html" class="">Ruby 安装</a>
+            <a href="samba.html" class="">Samba 安装</a>
+            <a href="在5分钟内搭建企业内部私有npm仓库.html" class="">搭建私有 npm 仓库</a>
+            <a href="Java.html" class="">安装 Java</a>
+            <a href="部署Seafile搭建自己的网盘.html" class="">部署 Seafile 搭建自己的网盘</a>
+            <a href="搭建Shadowsocks服务器.html" class="">搭建 Shadowsocks 服务器</a>
+            <a href="部署YApi平台.html" class="">部署 YApi 平台</a>
+            <a href="openstack.html" class="">搭建 OpenStack</a>
+            <a href="pip.html" class="">安装 pip 工具</a>
+            <a href="修改ssh端口号的方法.html" class="">修改 ssh 端口号的方法</a>
+            <a href="尝试在CentOS7.2上编译安装Swift.html" class="">在CentOS 上编译安装 Swift</a>
+            <a href="使用免费SSL证书让网站支持HTTPS访问.html" class="">使用免费 SSL 证书支持 HTTPS 访问</a>
+            <a href="svn.html" class="">安装使用 svn</a>
+            <a href="管理远程会话screen工具.html" class="">管理远程会话screen工具</a>
+            <label>其它</label>
+            <a href="../other/weixin-public-account.html" class="">公众账号推荐</a>
+            <a href="../other/google.html" class="">谷歌(Google)镜像</a>
+            <a href="../other/离线预览各种前端文档网站.html" class="">离线预览前端文档</a>
+            <a href="../other/通过代理工具提高Github Clone速度.html" class="">提高 Github Clone 速度</a>
+            <a href="../other/github-oraganizations.html" class="">国内互联网公司的开源项目汇总</a>
+            <a href="../other/HTTP-status-codes.html" class="">常见HTTP/FTP错误代码大全</a>
+            <a href="../other/Lua5.3.html" class="">Lua 5.3 文档</a>
+            <a href="../Shortcuts/Sketch.html" class="">Sketch 设计软件快捷键</a>
+            <a href="../Shortcuts/bash.html" class="">命令行工具bash快捷键</a>
+          </div>
+        </aside>
+      </div>
+      <markdown-style>
+        <h1 id="centos7安装配置vsftp搭建ftp"><a aria-hidden="true" tabindex="-1" href="#centos7安装配置vsftp搭建ftp" class="anchor"><span class="icon icon-link"></span></a>CentOS7安装配置vsftp搭建FTP</h1>
+        <p>安装配置vsftpd做FTP服务，我们的项目应用使用git管理进行迭代，公共文件软件存储使用开源网盘Seafile来管理，基本够用。想不到FTP的使用的场景，感觉它好像老去了，虽然现在基本没有用到这个工具，刚好公司公司刷一个硬件需要使用FTP来配置下载文件，于是研究使用了一下，记录了一下使用过程。😀</p>
+        <h2 id="安装"><a aria-hidden="true" tabindex="-1" href="#安装" class="anchor"><span class="icon icon-link"></span></a>安装</h2>
+        <p>在安装前查看是否已安装vsftpd</p>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1"><span class="token comment"># 查看是否已安装 方法一</span>
+</span><span class="code-line line-number" line="2"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment"># rpm -q vsftpd</span>
+</span><span class="code-line line-number" line="3">vsftpd-3.0.2-21.el7.x86_64
+</span><span class="code-line line-number" line="4">
+</span><span class="code-line line-number" line="5"><span class="token comment"># 查看是否已安装 方法二</span>
+</span><span class="code-line line-number" line="6"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment"># vsftpd -v</span>
+</span><span class="code-line line-number" line="7">vsftpd: version <span class="token number">3.0</span>.2
+</span><span class="code-line line-number" line="8">
+</span><span class="code-line line-number" line="9"><span class="token comment"># 安装 vsftpd</span>
+</span><span class="code-line line-number" line="10"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment"># yum -y install vsftpd</span>
+</span></code><input type="hidden" value="# 查看是否已安装 方法一
+[root@localhost ~]# rpm -q vsftpd
+vsftpd-3.0.2-21.el7.x86_64
+
+# 查看是否已安装 方法二
+[root@localhost ~]# vsftpd -v
+vsftpd: version 3.0.2
+
+# 安装 vsftpd
+[root@localhost ~]# yum -y install vsftpd
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h2 id="查看位置"><a aria-hidden="true" tabindex="-1" href="#查看位置" class="anchor"><span class="icon icon-link"></span></a>查看位置</h2>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1"><span class="token punctuation">[</span>root@localhost ~<span class="token punctuation">]</span><span class="token comment"># whereis vsftpd</span>
+</span><span class="code-line line-number" line="2">vsftpd: /usr/sbin/vsftpd /etc/vsftpd /usr/share/man/man8/vsftpd.8.gz
+</span></code><input type="hidden" value="[root@localhost ~]# whereis vsftpd
+vsftpd: /usr/sbin/vsftpd /etc/vsftpd /usr/share/man/man8/vsftpd.8.gz
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h2 id="启动vsftpd服务"><a aria-hidden="true" tabindex="-1" href="#启动vsftpd服务" class="anchor"><span class="icon icon-link"></span></a>启动vsftpd服务</h2>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1">systemctl start vsftpd.service
+</span></code><input type="hidden" value="systemctl start vsftpd.service
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h2 id="关闭firewall和selinux"><a aria-hidden="true" tabindex="-1" href="#关闭firewall和selinux" class="anchor"><span class="icon icon-link"></span></a>关闭firewall和SELinux</h2>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1">setenforce <span class="token number">0</span>   <span class="token comment"># 设置SELinux 成为permissive模式  （关闭SELinux）</span>
+</span><span class="code-line line-number" line="2">setenforce <span class="token number">1</span>   <span class="token comment"># 设置SELinux 成为enforcing模式   （开启SELinux）</span>
+</span><span class="code-line line-number" line="3">
+</span><span class="code-line line-number" line="4"><span class="token comment"># 或者修改配置</span>
+</span><span class="code-line line-number" line="5"><span class="token function">vi</span> /etc/selinux/config
+</span><span class="code-line line-number" line="6"><span class="token comment"># SELINUX=enforcing</span>
+</span><span class="code-line line-number" line="7"><span class="token comment"># 注释掉</span>
+</span><span class="code-line line-number" line="8"><span class="token comment"># SELINUXTYPE=targeted</span>
+</span><span class="code-line line-number" line="9"><span class="token comment"># 注释掉</span>
+</span><span class="code-line line-number" line="10"><span class="token assign-left variable">SELINUX</span><span class="token operator">=</span>disabled
+</span><span class="code-line line-number" line="11"><span class="token comment"># 增加</span>
+</span><span class="code-line line-number" line="12">:wq<span class="token operator">!</span> <span class="token comment">#保存退出</span>
+</span><span class="code-line line-number" line="13">setenforce <span class="token number">0</span>
+</span></code><input type="hidden" value="setenforce 0   # 设置SELinux 成为permissive模式  （关闭SELinux）
+setenforce 1   # 设置SELinux 成为enforcing模式   （开启SELinux）
+
+# 或者修改配置
+vi /etc/selinux/config
+# SELINUX=enforcing
+# 注释掉
+# SELINUXTYPE=targeted
+# 注释掉
+SELINUX=disabled
+# 增加
+:wq! #保存退出
+setenforce 0
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <p>或者设置SELinux</p>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1">
+</span><span class="code-line line-number" line="2">getsebool -a <span class="token operator">|</span> <span class="token function">grep</span> <span class="token function">ftp</span>
+</span><span class="code-line line-number" line="3">setsebool -P ftpd_full_access on
+</span></code><input type="hidden" value="
+getsebool -a | grep ftp
+setsebool -P ftpd_full_access on
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1">systemctl stop firewalld.service
+</span><span class="code-line line-number" line="2"><span class="token comment">#停止firewall</span>
+</span><span class="code-line line-number" line="3">systemctl disable firewalld.service
+</span><span class="code-line line-number" line="4"><span class="token comment">#禁止firewall开机启动</span>
+</span></code><input type="hidden" value="systemctl stop firewalld.service
+#停止firewall
+systemctl disable firewalld.service
+#禁止firewall开机启动
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <p>如果你不愿意关闭防火墙，需要防火墙添加FTP服务。</p>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1">firewall-cmd --permanent --zone<span class="token operator">=</span>public --add-service<span class="token operator">=</span>ftp
+</span><span class="code-line line-number" line="2">firewall-cmd --reload
+</span></code><input type="hidden" value="firewall-cmd --permanent --zone=public --add-service=ftp
+firewall-cmd --reload
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h2 id="修改配置文件"><a aria-hidden="true" tabindex="-1" href="#修改配置文件" class="anchor"><span class="icon icon-link"></span></a>修改配置文件</h2>
+        <p>配置文件<code>/etc/vsftpd/vsftpd.conf</code></p>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1"><span class="token assign-left variable">anonymous_enable</span><span class="token operator">=</span>NO        <span class="token comment"># 不允许匿名访问，禁用匿名登录</span>
+</span><span class="code-line line-number" line="2"><span class="token assign-left variable">chroot_local_user</span><span class="token operator">=</span>YES      <span class="token comment"># 启用限定用户在其主目录下</span>
+</span><span class="code-line line-number" line="3"><span class="token assign-left variable">use_localtime</span><span class="token operator">=</span>YES          <span class="token comment"># 使用本地时(自行添加)</span>
+</span><span class="code-line line-number" line="4"><span class="token assign-left variable">chroot_list_enable</span><span class="token operator">=</span>YES
+</span><span class="code-line line-number" line="5"><span class="token assign-left variable">local_enable</span><span class="token operator">=</span>YES           <span class="token comment"># 允许使用本地帐户进行FTP用户登录验证</span>
+</span><span class="code-line line-number" line="6"><span class="token assign-left variable">allow_writeable_chroot</span><span class="token operator">=</span>YES <span class="token comment"># 如果启用了限定用户在其主目录下需要添加这个配置，解决报错 500 OOPS: vsftpd: refusing to run with writable root inside chroot()</span>
+</span><span class="code-line line-number" line="7"><span class="token assign-left variable">xferlog_enable</span><span class="token operator">=</span>YES         <span class="token comment"># 启用上传和下载的日志功能，默认开启。</span>
+</span><span class="code-line line-number" line="8"><span class="token assign-left variable">local_umask</span><span class="token operator">=</span>022            <span class="token comment"># 设置本地用户默认文件掩码022</span>
+</span><span class="code-line line-number" line="9"><span class="token comment"># FTP上本地的文件权限，默认是077，不过vsftpd安装后的配置文件里默认是022</span>
+</span></code><input type="hidden" value="anonymous_enable=NO        # 不允许匿名访问，禁用匿名登录
+chroot_local_user=YES      # 启用限定用户在其主目录下
+use_localtime=YES          # 使用本地时(自行添加)
+chroot_list_enable=YES
+local_enable=YES           # 允许使用本地帐户进行FTP用户登录验证
+allow_writeable_chroot=YES # 如果启用了限定用户在其主目录下需要添加这个配置，解决报错 500 OOPS: vsftpd: refusing to run with writable root inside chroot()
+xferlog_enable=YES         # 启用上传和下载的日志功能，默认开启。
+local_umask=022            # 设置本地用户默认文件掩码022
+# FTP上本地的文件权限，默认是077，不过vsftpd安装后的配置文件里默认是022
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <p>虚拟用户高级参数</p>
+        <pre><code class="code-highlight"><span class="code-line line-number" line="1">当virtual_use_local_privs=YES 时，虚拟用户和本地用户有相同的权限；
+</span><span class="code-line line-number" line="2">当virtual_use_local_privs=NO  时，虚拟用户和匿名用户有相同的权限，默认是NO。
+</span><span class="code-line line-number" line="3">当virtual_use_local_privs=YES，write_enable=YES时，虚拟用户具有写权限（上传、下载、删除、重命名）。
+</span><span class="code-line line-number" line="4">当virtual_use_local_privs=NO，write_enable=YES，anon_world_readable_only=YES，
+</span><span class="code-line line-number" line="5">anon_upload_enable=YES时，虚拟用户不能浏览目录，只能上传文件，无其他权限。
+</span><span class="code-line line-number" line="6">当virtual_use_local_privs=NO，write_enable=YES，anon_world_readable_only=NO，
+</span><span class="code-line line-number" line="7">anon_upload_enable=NO时，虚拟用户只能下载文件，无其他权限。
+</span><span class="code-line line-number" line="8">当virtual_use_local_privs=NO，write_enable=YES，anon_world_readable_only=NO，
+</span><span class="code-line line-number" line="9">anon_upload_enable=YES时，虚拟用户只能上传和下载文件，无其他权限。
+</span><span class="code-line line-number" line="10">当virtual_use_local_privs=NO，write_enable=YES，anon_world_readable_only=NO，
+</span><span class="code-line line-number" line="11">anon_mkdir_write_enable=YES时，虚拟用户只能下载文件和创建文件夹，无其他权限。
+</span><span class="code-line line-number" line="12">当virtual_use_local_privs=NO，write_enable=YES，anon_world_readable_only=NO，
+</span><span class="code-line line-number" line="13">anon_other_write_enable=YES时，虚拟用户只能下载、删除和重命名文件，无其他权限。
+</span></code><input type="hidden" value="当virtual_use_local_privs=YES 时，虚拟用户和本地用户有相同的权限；
+当virtual_use_local_privs=NO  时，虚拟用户和匿名用户有相同的权限，默认是NO。
+当virtual_use_local_privs=YES，write_enable=YES时，虚拟用户具有写权限（上传、下载、删除、重命名）。
+当virtual_use_local_privs=NO，write_enable=YES，anon_world_readable_only=YES，
+anon_upload_enable=YES时，虚拟用户不能浏览目录，只能上传文件，无其他权限。
+当virtual_use_local_privs=NO，write_enable=YES，anon_world_readable_only=NO，
+anon_upload_enable=NO时，虚拟用户只能下载文件，无其他权限。
+当virtual_use_local_privs=NO，write_enable=YES，anon_world_readable_only=NO，
+anon_upload_enable=YES时，虚拟用户只能上传和下载文件，无其他权限。
+当virtual_use_local_privs=NO，write_enable=YES，anon_world_readable_only=NO，
+anon_mkdir_write_enable=YES时，虚拟用户只能下载文件和创建文件夹，无其他权限。
+当virtual_use_local_privs=NO，write_enable=YES，anon_world_readable_only=NO，
+anon_other_write_enable=YES时，虚拟用户只能下载、删除和重命名文件，无其他权限。
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h2 id="匿名登录"><a aria-hidden="true" tabindex="-1" href="#匿名登录" class="anchor"><span class="icon icon-link"></span></a>匿名登录</h2>
+        <p>安装完默认情况下是开启匿名登录的，对应的是 <code>/var/ftp</code> 目录，这时只要服务启动了，就可以直接连上FTP了。默认用户名是<code>ftp</code>，密码是空的。如果你在配置里面配置了<code>anonymous_enable=NO</code>，匿名就无法登录。</p>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1">$ <span class="token function">ftp</span> <span class="token number">192.168</span>.188.114
+</span><span class="code-line line-number" line="2">
+</span><span class="code-line line-number" line="3">Connected to <span class="token number">192.168</span>.188.114.
+</span><span class="code-line line-number" line="4"><span class="token number">220</span> <span class="token punctuation">(</span>vsFTPd <span class="token number">3.0</span>.2<span class="token punctuation">)</span>
+</span><span class="code-line line-number" line="5">Name <span class="token punctuation">(</span><span class="token number">192.168</span>.188.114:kennywang<span class="token punctuation">)</span>: <span class="token function">ftp</span>
+</span><span class="code-line line-number" line="6"><span class="token number">331</span> Please specify the password.
+</span><span class="code-line line-number" line="7">Password:
+</span><span class="code-line line-number" line="8"><span class="token number">230</span> Login successful.
+</span><span class="code-line line-number" line="9">Remote system <span class="token builtin class-name">type</span> is UNIX.
+</span><span class="code-line line-number" line="10">Using binary mode to transfer files.
+</span><span class="code-line line-number" line="11">ftp<span class="token operator">></span> <span class="token function">ls</span>
+</span><span class="code-line line-number" line="12"><span class="token number">229</span> Entering Extended Passive Mode <span class="token punctuation">(</span><span class="token operator">||</span><span class="token operator">|</span><span class="token number">47867</span><span class="token operator">|</span><span class="token punctuation">)</span>.
+</span><span class="code-line line-number" line="13"><span class="token number">150</span> Here comes the directory listing.
+</span><span class="code-line line-number" line="14">-rw-r--r--    <span class="token number">1</span> <span class="token number">0</span>        <span class="token number">0</span>              <span class="token number">12</span> Jan <span class="token number">18</span> 06:31 README.md
+</span><span class="code-line line-number" line="15">drwxr-xr-x    <span class="token number">2</span> <span class="token number">0</span>        <span class="token number">0</span>               <span class="token number">6</span> Nov 05 <span class="token number">19</span>:43 pub
+</span><span class="code-line line-number" line="16"><span class="token number">226</span> Directory send OK.
+</span></code><input type="hidden" value="$ ftp 192.168.188.114
+
+Connected to 192.168.188.114.
+220 (vsFTPd 3.0.2)
+Name (192.168.188.114:kennywang): ftp
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls
+229 Entering Extended Passive Mode (|||47867|).
+150 Here comes the directory listing.
+-rw-r--r--    1 0        0              12 Jan 18 06:31 README.md
+drwxr-xr-x    2 0        0               6 Nov 05 19:43 pub
+226 Directory send OK.
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h2 id="多用户配置"><a aria-hidden="true" tabindex="-1" href="#多用户配置" class="anchor"><span class="icon icon-link"></span></a>多用户配置</h2>
+        <p>多用户配置需要自己手工添加配置，下面内容到vsftpd.conf末尾</p>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1"><span class="token comment"># </span>
+</span><span class="code-line line-number" line="2"><span class="token comment"># </span>
+</span><span class="code-line line-number" line="3">
+</span><span class="code-line line-number" line="4"><span class="token assign-left variable">use_localtime</span><span class="token operator">=</span>YES          <span class="token comment"># 使用本地时(自行添加)</span>
+</span><span class="code-line line-number" line="5"><span class="token assign-left variable">listen_port</span><span class="token operator">=</span><span class="token number">21</span>
+</span><span class="code-line line-number" line="6"><span class="token assign-left variable">chroot_local_user</span><span class="token operator">=</span>YES      <span class="token comment"># 启用限定用户在其主目录下</span>
+</span><span class="code-line line-number" line="7"><span class="token assign-left variable">idle_session_timeout</span><span class="token operator">=</span><span class="token number">300</span>
+</span><span class="code-line line-number" line="8">
+</span><span class="code-line line-number" line="9"><span class="token assign-left variable">data_connection_timeout</span><span class="token operator">=</span><span class="token number">120</span>  <span class="token comment"># 数据连接超时时间</span>
+</span><span class="code-line line-number" line="10"><span class="token assign-left variable">guest_enable</span><span class="token operator">=</span>YES             <span class="token comment"># 设定启用虚拟用户功能</span>
+</span><span class="code-line line-number" line="11"><span class="token assign-left variable">guest_username</span><span class="token operator">=</span>ftpuser       <span class="token comment"># 指定虚拟用户的宿主用户 ftpuser（就是我们后面会新建这个用户）</span>
+</span><span class="code-line line-number" line="12"><span class="token comment"># guest_username=www</span>
+</span><span class="code-line line-number" line="13"><span class="token comment"># 如果ftp目录是指向网站根目录，用来上传网站程序，</span>
+</span><span class="code-line line-number" line="14"><span class="token comment"># 可以指定虚拟用户的宿主用户为nginx运行账户www，可以避免很多权限设置问题 </span>
+</span><span class="code-line line-number" line="15">
+</span><span class="code-line line-number" line="16">
+</span><span class="code-line line-number" line="17"><span class="token assign-left variable">user_config_dir</span><span class="token operator">=</span>/etc/vsftpd/vuser_conf   <span class="token comment"># 虚拟用户配置文件目录</span>
+</span><span class="code-line line-number" line="18"><span class="token assign-left variable">virtual_use_local_privs</span><span class="token operator">=</span>YES <span class="token comment"># NO时，虚拟用户和匿名用户有相同的权限，默认是NO</span>
+</span><span class="code-line line-number" line="19">
+</span><span class="code-line line-number" line="20"><span class="token assign-left variable">pasv_min_port</span><span class="token operator">=</span><span class="token number">10060</span>         <span class="token comment"># 被动模式最小端口号10060</span>
+</span><span class="code-line line-number" line="21"><span class="token assign-left variable">pasv_max_port</span><span class="token operator">=</span><span class="token number">10090</span>         <span class="token comment"># 被动模式最大端口号10090</span>
+</span><span class="code-line line-number" line="22">
+</span><span class="code-line line-number" line="23"><span class="token assign-left variable">accept_timeout</span><span class="token operator">=</span><span class="token number">5</span>
+</span><span class="code-line line-number" line="24"><span class="token assign-left variable">connect_timeout</span><span class="token operator">=</span><span class="token number">1</span>
+</span></code><input type="hidden" value="# 
+# 
+
+use_localtime=YES          # 使用本地时(自行添加)
+listen_port=21
+chroot_local_user=YES      # 启用限定用户在其主目录下
+idle_session_timeout=300
+
+data_connection_timeout=120  # 数据连接超时时间
+guest_enable=YES             # 设定启用虚拟用户功能
+guest_username=ftpuser       # 指定虚拟用户的宿主用户 ftpuser（就是我们后面会新建这个用户）
+# guest_username=www
+# 如果ftp目录是指向网站根目录，用来上传网站程序，
+# 可以指定虚拟用户的宿主用户为nginx运行账户www，可以避免很多权限设置问题 
+
+
+user_config_dir=/etc/vsftpd/vuser_conf   # 虚拟用户配置文件目录
+virtual_use_local_privs=YES # NO时，虚拟用户和匿名用户有相同的权限，默认是NO
+
+pasv_min_port=10060         # 被动模式最小端口号10060
+pasv_max_port=10090         # 被动模式最大端口号10090
+
+accept_timeout=5
+connect_timeout=1
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h3 id="创建宿主用户"><a aria-hidden="true" tabindex="-1" href="#创建宿主用户" class="anchor"><span class="icon icon-link"></span></a>创建宿主用户</h3>
+        <p>新建系统用户ftpuser，用户目录为<code>/home/vsftpd</code>, 用户登录终端设为/bin/false(即使之不能登录系统)</p>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1"><span class="token comment"># 方法一</span>
+</span><span class="code-line line-number" line="2"><span class="token comment"># 创建用户 ftpuser 指定 `/home/vsftpd` 目录</span>
+</span><span class="code-line line-number" line="3"><span class="token function">useradd</span> -g root -M -d /home/vsftpd -s /sbin/nologin ftpuser
+</span><span class="code-line line-number" line="4">
+</span><span class="code-line line-number" line="5"><span class="token comment"># 设置用户 ftpuser 的密码</span>
+</span><span class="code-line line-number" line="6"><span class="token function">passwd</span> ftpuser
+</span><span class="code-line line-number" line="7"><span class="token comment"># 把 /home/vsftpd 的所有权给ftpuser.root</span>
+</span><span class="code-line line-number" line="8"><span class="token function">chown</span> -R ftpuser.root /home/vsftpd
+</span><span class="code-line line-number" line="9">
+</span><span class="code-line line-number" line="10"><span class="token comment"># 方法二</span>
+</span><span class="code-line line-number" line="11"><span class="token function">useradd</span> ftpuser -d /home/vsftpd -s /bin/false
+</span><span class="code-line line-number" line="12"><span class="token function">chown</span> ftpuser:ftpuser /home/vsftpd -R 
+</span><span class="code-line line-number" line="13">
+</span><span class="code-line line-number" line="14"><span class="token comment"># 如果虚拟用户的宿主用户为www，需要这样设置</span>
+</span><span class="code-line line-number" line="15"><span class="token comment"># www目录是你应用的目录</span>
+</span><span class="code-line line-number" line="16"><span class="token function">chown</span> www:www /home/www -R
+</span></code><input type="hidden" value="# 方法一
+# 创建用户 ftpuser 指定 &#x60;/home/vsftpd&#x60; 目录
+useradd -g root -M -d /home/vsftpd -s /sbin/nologin ftpuser
+
+# 设置用户 ftpuser 的密码
+passwd ftpuser
+# 把 /home/vsftpd 的所有权给ftpuser.root
+chown -R ftpuser.root /home/vsftpd
+
+# 方法二
+useradd ftpuser -d /home/vsftpd -s /bin/false
+chown ftpuser:ftpuser /home/vsftpd -R 
+
+# 如果虚拟用户的宿主用户为www，需要这样设置
+# www目录是你应用的目录
+chown www:www /home/www -R
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <p>删除用户 <code>userdel ftpuser</code></p>
+        <h3 id="建立虚拟用户文件"><a aria-hidden="true" tabindex="-1" href="#建立虚拟用户文件" class="anchor"><span class="icon icon-link"></span></a>建立虚拟用户文件</h3>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1"><span class="token function">touch</span> /etc/vsftpd/vuser_passwd
+</span><span class="code-line line-number" line="2"><span class="token comment"># 编辑虚拟用户名单文件：（</span>
+</span><span class="code-line line-number" line="3"><span class="token comment"># 第一行账号，第二行密码，注意：不能使用root做用户名，系统保留）</span>
+</span><span class="code-line line-number" line="4"><span class="token function">vi</span> /etc/vsftpd/vuser_passwd 
+</span><span class="code-line line-number" line="5"><span class="token comment"># 编辑内容，下面是 vuser_passwd 内容</span>
+</span><span class="code-line line-number" line="6">wcj
+</span><span class="code-line line-number" line="7"><span class="token number">123456</span>
+</span><span class="code-line line-number" line="8">hss
+</span><span class="code-line line-number" line="9"><span class="token number">123456</span>
+</span><span class="code-line line-number" line="10"><span class="token comment">#保存退出</span>
+</span></code><input type="hidden" value="touch /etc/vsftpd/vuser_passwd
+# 编辑虚拟用户名单文件：（
+# 第一行账号，第二行密码，注意：不能使用root做用户名，系统保留）
+vi /etc/vsftpd/vuser_passwd 
+# 编辑内容，下面是 vuser_passwd 内容
+wcj
+123456
+hss
+123456
+#保存退出
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h3 id="生成虚拟用户数据文件"><a aria-hidden="true" tabindex="-1" href="#生成虚拟用户数据文件" class="anchor"><span class="icon icon-link"></span></a>生成虚拟用户数据文件</h3>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1">db_load -T -t <span class="token builtin class-name">hash</span> -f /etc/vsftpd/vuser_passwd /etc/vsftpd/vuser_passwd.db
+</span><span class="code-line line-number" line="2"><span class="token function">chmod</span> <span class="token number">600</span> /etc/vsftpd/vuser_passwd.db
+</span></code><input type="hidden" value="db_load -T -t hash -f /etc/vsftpd/vuser_passwd /etc/vsftpd/vuser_passwd.db
+chmod 600 /etc/vsftpd/vuser_passwd.db
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h3 id="创建用户配置"><a aria-hidden="true" tabindex="-1" href="#创建用户配置" class="anchor"><span class="icon icon-link"></span></a>创建用户配置</h3>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1"><span class="token function">mkdir</span> /etc/vsftpd/vuser_conf  <span class="token comment"># 建立虚拟用户个人vsftp的配置文件</span>
+</span><span class="code-line line-number" line="2"><span class="token builtin class-name">cd</span> /etc/vsftpd/vuser_conf     <span class="token comment"># 进入目录</span>
+</span><span class="code-line line-number" line="3"><span class="token function">touch</span> hss wcj                 <span class="token comment"># 这里创建两个虚拟用户配置文件</span>
+</span></code><input type="hidden" value="mkdir /etc/vsftpd/vuser_conf  # 建立虚拟用户个人vsftp的配置文件
+cd /etc/vsftpd/vuser_conf     # 进入目录
+touch hss wcj                 # 这里创建两个虚拟用户配置文件
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <p>每一个文件配置文件都差不多，只是参数<code>local_root</code>不一样。</p>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1"><span class="token assign-left variable">local_root</span><span class="token operator">=</span>/home/vsftpd/hss   <span class="token comment"># 用户 hss 配置目录，这个地方不一样</span>
+</span><span class="code-line line-number" line="2"><span class="token assign-left variable">write_enable</span><span class="token operator">=</span>YES              <span class="token comment"># 允许本地用户对FTP服务器文件具有写权限</span>
+</span><span class="code-line line-number" line="3"><span class="token assign-left variable">anon_world_readable_only</span><span class="token operator">=</span>NO
+</span><span class="code-line line-number" line="4"><span class="token assign-left variable">anon_upload_enable</span><span class="token operator">=</span>YES        <span class="token comment"># 允许匿名用户上传文件(须将全局的write_enable=YES,默认YES)</span>
+</span><span class="code-line line-number" line="5"><span class="token assign-left variable">anon_mkdir_write_enable</span><span class="token operator">=</span>YES   <span class="token comment"># 允许匿名用户创建目录</span>
+</span><span class="code-line line-number" line="6"><span class="token assign-left variable">anon_other_write_enable</span><span class="token operator">=</span>YES   <span class="token comment"># 允许匿名用户删除和重命名权限(自行添加)</span>
+</span></code><input type="hidden" value="local_root=/home/vsftpd/hss   # 用户 hss 配置目录，这个地方不一样
+write_enable=YES              # 允许本地用户对FTP服务器文件具有写权限
+anon_world_readable_only=NO
+anon_upload_enable=YES        # 允许匿名用户上传文件(须将全局的write_enable=YES,默认YES)
+anon_mkdir_write_enable=YES   # 允许匿名用户创建目录
+anon_other_write_enable=YES   # 允许匿名用户删除和重命名权限(自行添加)
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h3 id="创建用户目录"><a aria-hidden="true" tabindex="-1" href="#创建用户目录" class="anchor"><span class="icon icon-link"></span></a>创建用户目录</h3>
+        <p>每个用户目录文件夹是有root用户创建的，也就是上面<code>local_root</code>配置目录，其权限应设置为755。因为权限的问题在该文件夹内无法直接上传文件。而如果设置为777则无法访问，这是由于vsftpd的安全性设置。解决上传问题的方法是在local_root文件夹内新建一个upload的文件夹，权限设置为777，可将文件上传到该文件夹。</p>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1"><span class="token function">mkdir</span> -p /home/vsftpd/hss     <span class="token comment"># 每个用户对于一个目录，创建两个目录“hss”、“wcj”</span>
+</span><span class="code-line line-number" line="2">
+</span><span class="code-line line-number" line="3"><span class="token comment"># 下面是目录结构</span>
+</span><span class="code-line line-number" line="4">/home/vsftpd
+</span><span class="code-line line-number" line="5">      ├── hss
+</span><span class="code-line line-number" line="6">      │   ├── filename.md
+</span><span class="code-line line-number" line="7">      │   └── upload
+</span><span class="code-line line-number" line="8">      └── wcj
+</span><span class="code-line line-number" line="9">          └── filename.md
+</span><span class="code-line line-number" line="10">
+</span><span class="code-line line-number" line="11">
+</span><span class="code-line line-number" line="12"><span class="token comment"># 赋予其权限</span>
+</span><span class="code-line line-number" line="13"><span class="token function">chmod</span> -R <span class="token number">777</span> /var/vsftpd/hss/upload/
+</span><span class="code-line line-number" line="14">
+</span><span class="code-line line-number" line="15"><span class="token comment"># 在/var/ftp下新建一个目录来实现匿名用户上传</span>
+</span><span class="code-line line-number" line="16"><span class="token function">mkdir</span> /var/ftp/upload
+</span></code><input type="hidden" value="mkdir -p /home/vsftpd/hss     # 每个用户对于一个目录，创建两个目录“hss”、“wcj”
+
+# 下面是目录结构
+/home/vsftpd
+      ├── hss
+      │   ├── filename.md
+      │   └── upload
+      └── wcj
+          └── filename.md
+
+
+# 赋予其权限
+chmod -R 777 /var/vsftpd/hss/upload/
+
+# 在/var/ftp下新建一个目录来实现匿名用户上传
+mkdir /var/ftp/upload
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <p>vsftpd中几种用户的区分：</p>
+        <p><strong>本地用户</strong>：用户在FTP服务器拥有账号，且该账号为本地用户的账号，可以通过自己的账号和口令进行授权登录，登录目录为自己的home目录<code>$HOME</code><br><strong>虚拟用户</strong>：用户在FTP服务器上拥有账号，但该账号只能用于文件传输服务。登录目录为某一特定的目录，通常可以上传和下载<br><strong>匿名用户</strong>：用户在FTP服务器上没有账号，登录目录为/var/ftp</p>
+        <h3 id="最后重启vsftpd服务器"><a aria-hidden="true" tabindex="-1" href="#最后重启vsftpd服务器" class="anchor"><span class="icon icon-link"></span></a>最后重启vsftpd服务器</h3>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1">systemctl restart vsftpd.service
+</span></code><input type="hidden" value="systemctl restart vsftpd.service
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h2 id="服务运维"><a aria-hidden="true" tabindex="-1" href="#服务运维" class="anchor"><span class="icon icon-link"></span></a>服务运维</h2>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1">systemctl restart vsftpd.service  <span class="token comment"># 重启服务</span>
+</span><span class="code-line line-number" line="2">systemctl start vsftpd.service    <span class="token comment"># 启动服务</span>
+</span><span class="code-line line-number" line="3">systemctl status vsftpd.service   <span class="token comment"># 服务状态查看</span>
+</span></code><input type="hidden" value="systemctl restart vsftpd.service  # 重启服务
+systemctl start vsftpd.service    # 启动服务
+systemctl status vsftpd.service   # 服务状态查看
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h2 id="ftp命令"><a aria-hidden="true" tabindex="-1" href="#ftp命令" class="anchor"><span class="icon icon-link"></span></a>FTP命令</h2>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1">ftp<span class="token operator">></span> ascii  <span class="token comment"># 设定以ASCII方式传送文件(缺省值) </span>
+</span><span class="code-line line-number" line="2">ftp<span class="token operator">></span> bell   <span class="token comment"># 每完成一次文件传送,报警提示. </span>
+</span><span class="code-line line-number" line="3">ftp<span class="token operator">></span> binary <span class="token comment"># 设定以二进制方式传送文件. </span>
+</span><span class="code-line line-number" line="4">ftp<span class="token operator">></span> bye    <span class="token comment"># 终止主机FTP进程,并退出FTP管理方式. </span>
+</span><span class="code-line line-number" line="5">ftp<span class="token operator">></span> <span class="token keyword">case</span> <span class="token comment"># 当为ON时,用MGET命令拷贝的文件名到本地机器中,全部转换为小写字母. </span>
+</span><span class="code-line line-number" line="6">ftp<span class="token operator">></span> <span class="token builtin class-name">cd</span>     <span class="token comment"># 同UNIX的CD命令. </span>
+</span><span class="code-line line-number" line="7">ftp<span class="token operator">></span> cdup   <span class="token comment"># 返回上一级目录. </span>
+</span><span class="code-line line-number" line="8">ftp<span class="token operator">></span> <span class="token function">chmod</span>  <span class="token comment"># 改变远端主机的文件权限. </span>
+</span><span class="code-line line-number" line="9">ftp<span class="token operator">></span> close  <span class="token comment"># 终止远端的FTP进程,返回到FTP命令状态, 所有的宏定义都被删除. </span>
+</span><span class="code-line line-number" line="10">ftp<span class="token operator">></span> delete <span class="token comment"># 删除远端主机中的文件. </span>
+</span><span class="code-line line-number" line="11">ftp<span class="token operator">></span> <span class="token function">dir</span> <span class="token punctuation">[</span>remote-directory<span class="token punctuation">]</span> <span class="token punctuation">[</span>local-file<span class="token punctuation">]</span> <span class="token comment"># 列出当前远端主机目录中的文件.如果有本地文件,就将结果写至本地文件. </span>
+</span><span class="code-line line-number" line="12">ftp<span class="token operator">></span> get <span class="token punctuation">[</span>remote-file<span class="token punctuation">]</span> <span class="token punctuation">[</span>local-file<span class="token punctuation">]</span> <span class="token comment"># 从远端主机中传送至本地主机中. </span>
+</span><span class="code-line line-number" line="13">ftp<span class="token operator">></span> <span class="token builtin class-name">help</span> <span class="token punctuation">[</span>command<span class="token punctuation">]</span> <span class="token comment"># 输出命令的解释. </span>
+</span><span class="code-line line-number" line="14">ftp<span class="token operator">></span> lcd <span class="token comment"># 改变当前本地主机的工作目录,如果缺省,就转到当前用户的HOME目录. </span>
+</span><span class="code-line line-number" line="15">ftp<span class="token operator">></span> <span class="token function">ls</span> <span class="token punctuation">[</span>remote-directory<span class="token punctuation">]</span> <span class="token punctuation">[</span>local-file<span class="token punctuation">]</span> <span class="token comment"># 同DIR. </span>
+</span><span class="code-line line-number" line="16">ftp<span class="token operator">></span> macdef                 <span class="token comment"># 定义宏命令. </span>
+</span><span class="code-line line-number" line="17">ftp<span class="token operator">></span> mdelete <span class="token punctuation">[</span>remote-files<span class="token punctuation">]</span> <span class="token comment"># 删除一批文件. </span>
+</span><span class="code-line line-number" line="18">ftp<span class="token operator">></span> mget <span class="token punctuation">[</span>remote-files<span class="token punctuation">]</span>    <span class="token comment"># 从远端主机接收一批文件至本地主机. </span>
+</span><span class="code-line line-number" line="19">ftp<span class="token operator">></span> <span class="token function">mkdir</span> directory-name   <span class="token comment"># 在远端主机中建立目录. </span>
+</span><span class="code-line line-number" line="20">ftp<span class="token operator">></span> mput local-files <span class="token comment"># 将本地主机中一批文件传送至远端主机. </span>
+</span><span class="code-line line-number" line="21">ftp<span class="token operator">></span> <span class="token function">open</span> <span class="token function">host</span> <span class="token punctuation">[</span>port<span class="token punctuation">]</span> <span class="token comment"># 重新建立一个新的连接. </span>
+</span><span class="code-line line-number" line="22">ftp<span class="token operator">></span> prompt           <span class="token comment"># 交互提示模式. </span>
+</span><span class="code-line line-number" line="23">ftp<span class="token operator">></span> put local-file <span class="token punctuation">[</span>remote-file<span class="token punctuation">]</span> <span class="token comment"># 将本地一个文件传送至远端主机中. </span>
+</span><span class="code-line line-number" line="24">ftp<span class="token operator">></span> <span class="token builtin class-name">pwd</span>  <span class="token comment"># 列出当前远端主机目录. </span>
+</span><span class="code-line line-number" line="25">ftp<span class="token operator">></span> quit <span class="token comment"># 同BYE. </span>
+</span><span class="code-line line-number" line="26">ftp<span class="token operator">></span> recv remote-file <span class="token punctuation">[</span>local-file<span class="token punctuation">]</span> <span class="token comment"># 同GET. </span>
+</span><span class="code-line line-number" line="27">ftp<span class="token operator">></span> <span class="token function">rename</span> <span class="token punctuation">[</span>from<span class="token punctuation">]</span> <span class="token punctuation">[</span>to<span class="token punctuation">]</span>     <span class="token comment"># 改变远端主机中的文件名. </span>
+</span><span class="code-line line-number" line="28">ftp<span class="token operator">></span> <span class="token function">rmdir</span> directory-name   <span class="token comment"># 删除远端主机中的目录. </span>
+</span><span class="code-line line-number" line="29">ftp<span class="token operator">></span> send local-file <span class="token punctuation">[</span>remote-file<span class="token punctuation">]</span> <span class="token comment"># 同PUT. </span>
+</span><span class="code-line line-number" line="30">ftp<span class="token operator">></span> status   <span class="token comment"># 显示当前FTP的状态. </span>
+</span><span class="code-line line-number" line="31">ftp<span class="token operator">></span> system   <span class="token comment"># 显示远端主机系统类型. </span>
+</span><span class="code-line line-number" line="32">ftp<span class="token operator">></span> user user-name <span class="token punctuation">[</span>password<span class="token punctuation">]</span> <span class="token punctuation">[</span>account<span class="token punctuation">]</span> <span class="token comment"># 重新以别的用户名登录远端主机. </span>
+</span><span class="code-line line-number" line="33">ftp<span class="token operator">></span> ? <span class="token punctuation">[</span>command<span class="token punctuation">]</span> <span class="token comment"># 同HELP. [command]指定需要帮助的命令名称。如果没有指定 command，ftp 将显示全部命令的列表。</span>
+</span><span class="code-line line-number" line="34">ftp<span class="token operator">></span> <span class="token operator">!</span> <span class="token comment"># 从 ftp 子系统退出到外壳。 </span>
+</span></code><input type="hidden" value="ftp> ascii  # 设定以ASCII方式传送文件(缺省值) 
+ftp> bell   # 每完成一次文件传送,报警提示. 
+ftp> binary # 设定以二进制方式传送文件. 
+ftp> bye    # 终止主机FTP进程,并退出FTP管理方式. 
+ftp> case # 当为ON时,用MGET命令拷贝的文件名到本地机器中,全部转换为小写字母. 
+ftp> cd     # 同UNIX的CD命令. 
+ftp> cdup   # 返回上一级目录. 
+ftp> chmod  # 改变远端主机的文件权限. 
+ftp> close  # 终止远端的FTP进程,返回到FTP命令状态, 所有的宏定义都被删除. 
+ftp> delete # 删除远端主机中的文件. 
+ftp> dir [remote-directory] [local-file] # 列出当前远端主机目录中的文件.如果有本地文件,就将结果写至本地文件. 
+ftp> get [remote-file] [local-file] # 从远端主机中传送至本地主机中. 
+ftp> help [command] # 输出命令的解释. 
+ftp> lcd # 改变当前本地主机的工作目录,如果缺省,就转到当前用户的HOME目录. 
+ftp> ls [remote-directory] [local-file] # 同DIR. 
+ftp> macdef                 # 定义宏命令. 
+ftp> mdelete [remote-files] # 删除一批文件. 
+ftp> mget [remote-files]    # 从远端主机接收一批文件至本地主机. 
+ftp> mkdir directory-name   # 在远端主机中建立目录. 
+ftp> mput local-files # 将本地主机中一批文件传送至远端主机. 
+ftp> open host [port] # 重新建立一个新的连接. 
+ftp> prompt           # 交互提示模式. 
+ftp> put local-file [remote-file] # 将本地一个文件传送至远端主机中. 
+ftp> pwd  # 列出当前远端主机目录. 
+ftp> quit # 同BYE. 
+ftp> recv remote-file [local-file] # 同GET. 
+ftp> rename [from] [to]     # 改变远端主机中的文件名. 
+ftp> rmdir directory-name   # 删除远端主机中的目录. 
+ftp> send local-file [remote-file] # 同PUT. 
+ftp> status   # 显示当前FTP的状态. 
+ftp> system   # 显示远端主机系统类型. 
+ftp> user user-name [password] [account] # 重新以别的用户名登录远端主机. 
+ftp> ? [command] # 同HELP. [command]指定需要帮助的命令名称。如果没有指定 command，ftp 将显示全部命令的列表。
+ftp> ! # 从 ftp 子系统退出到外壳。 
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h3 id="关闭ftp连接"><a aria-hidden="true" tabindex="-1" href="#关闭ftp连接" class="anchor"><span class="icon icon-link"></span></a>关闭FTP连接</h3>
+        <pre><code class="language-shel code-highlight"><span class="code-line line-number" line="1">bye
+</span><span class="code-line line-number" line="2">exit
+</span><span class="code-line line-number" line="3">quit
+</span></code><input type="hidden" value="bye
+exit
+quit
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h3 id="下载文件"><a aria-hidden="true" tabindex="-1" href="#下载文件" class="anchor"><span class="icon icon-link"></span></a>下载文件</h3>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1">ftp<span class="token operator">></span> get readme.txt <span class="token comment"># 下载 readme.txt 文件</span>
+</span><span class="code-line line-number" line="2">ftp<span class="token operator">></span> mget *.txt     <span class="token comment"># 下载 </span>
+</span></code><input type="hidden" value="ftp> get readme.txt # 下载 readme.txt 文件
+ftp> mget *.txt     # 下载 
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h3 id="上传文件"><a aria-hidden="true" tabindex="-1" href="#上传文件" class="anchor"><span class="icon icon-link"></span></a>上传文件</h3>
+        <pre class="language-shell"><code class="language-shell code-highlight"><span class="code-line line-number" line="1">ftp<span class="token operator">></span> put /path/readme.txt <span class="token comment"># 上传 readme.txt 文件</span>
+</span><span class="code-line line-number" line="2">ftp<span class="token operator">></span> mput *.txt           <span class="token comment"># 可以上传多个文件</span>
+</span></code><input type="hidden" value="ftp> put /path/readme.txt # 上传 readme.txt 文件
+ftp> mput *.txt           # 可以上传多个文件
+"><div onclick="copied(this)" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
+        <h2 id="状态码"><a aria-hidden="true" tabindex="-1" href="#状态码" class="anchor"><span class="icon icon-link"></span></a>状态码</h2>
+        <ul>
+          <li>230 - 登录成功</li>
+          <li>200 - 命令执行成功</li>
+          <li>150 - 文件状态正常，开启数据连接端口</li>
+          <li>250 - 目录切换操作完成</li>
+          <li>226 - 关闭数据连接端口，请求的文件操作成功</li>
+        </ul>
+        <h2 id="参考资料"><a aria-hidden="true" tabindex="-1" href="#参考资料" class="anchor"><span class="icon icon-link"></span></a>参考资料</h2>
+        <ul>
+          <li><a href="http://hx100.blog.51cto.com/44326/383143/">Vsftpd虚拟用户的配置</a></li>
+          <li><a href="http://www.cnblogs.com/flandre/p/6051532.html">CentOS7安装和配置FTP</a></li>
+        </ul>
+        <div class="previous"><a class="prev" href="CentOS7安装维护Gitlab.html"><svg viewBox="0 0 1024 1024" width="16" height="16" fill="currentColor">
+              <path d="M842.666667 864c-8.533333 0-14.933333-2.133333-21.333334-8.533333l-341.333333-309.333334c-6.4-6.4-10.666667-14.933333-10.666667-23.466666 0-8.533333 4.266667-17.066667 10.666667-23.466667l341.333333-309.333333c12.8-12.8 34.133333-10.666667 44.8 2.133333 12.8 12.8 10.666667 34.133333-2.133333 44.8L548.266667 522.666667l315.733333 285.866666c12.8 10.666667 14.933333 32 2.133333 44.8-6.4 6.4-14.933333 10.666667-23.466666 10.666667z"></path>
+              <path d="M512 864c-8.533333 0-14.933333-2.133333-21.333333-8.533333L149.333333 546.133333c-6.4-6.4-10.666667-14.933333-10.666666-23.466666 0-8.533333 4.266667-17.066667 10.666666-23.466667L490.666667 189.866667c12.8-12.8 34.133333-10.666667 44.8 2.133333 12.8 12.8 10.666667 34.133333-2.133334 44.8L217.6 522.666667 533.333333 808.533333c12.8 12.8 14.933333 32 2.133334 44.8-6.4 6.4-14.933333 10.666667-23.466667 10.666667z"></path>
+            </svg>
+<span>安装维护 GitLab
+</span></a><a class="next" href="Centos7安装编译Node.html"><span>Centos7安装编译Node
+</span><svg viewBox="0 0 1024 1024" width="16" height="16" fill="currentColor">
+              <path d="M544 522.666667c0-8.533333-4.266667-17.066667-10.666667-23.466667L192 189.866667c-12.8-12.8-34.133333-10.666667-44.8 2.133333-12.8 12.8-10.666667 34.133333 2.133333 44.8l315.733334 285.866667L149.333333 808.533333c-12.8 12.8-14.933333 32-2.133333 44.8 6.4 6.4 14.933333 10.666667 23.466667 10.666667 8.533333 0 14.933333-2.133333 21.333333-8.533333l341.333333-309.333334c6.4-6.4 10.666667-14.933333 10.666667-23.466666z"></path>
+              <path d="M864 499.2l-341.333333-309.333333c-12.8-12.8-34.133333-10.666667-44.8 2.133333-12.8 12.8-10.666667 34.133333 2.133333 44.8l315.733333 285.866667-315.733333 285.866666c-12.8 12.8-14.933333 32-2.133333 44.8 6.4 6.4 14.933333 10.666667 23.466666 10.666667 8.533333 0 14.933333-2.133333 21.333334-8.533333l341.333333-309.333334c6.4-6.4 10.666667-14.933333 10.666667-23.466666 0-8.533333-4.266667-17.066667-10.666667-23.466667z"></path>
+            </svg></a></div>
+        <section class="article-footer"><a href="https://github.com/jaywcjlove/handbook/blob/master/docs/CentOS/CentOS7安装配置vsftp搭建FTP.md" class="edit-button" target="_blank" rel="noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+<span>Edit this page on GitHub</span>
+</a><span class="atime">2022/07/10</span></section>
+      </markdown-style>
+      <nav class="tocs">
+        <aside class="inner toc">
+          <ol class="tocs-list">
+            <li><a href="#安装" class="tocs-link">安装</a></li>
+            <li><a href="#查看位置" class="tocs-link">查看位置</a></li>
+            <li><a href="#启动vsftpd服务" class="tocs-link">启动vsftpd服务</a></li>
+            <li><a href="#关闭firewall和selinux" class="tocs-link">关闭firewall和SELinux</a></li>
+            <li><a href="#修改配置文件" class="tocs-link">修改配置文件</a></li>
+            <li><a href="#匿名登录" class="tocs-link">匿名登录</a></li>
+            <li><a href="#多用户配置" class="tocs-link">多用户配置</a>
+              <ol class="tocs-list is-collapsed">
+                <li><a href="#创建宿主用户" class="tocs-link">创建宿主用户</a></li>
+                <li><a href="#建立虚拟用户文件" class="tocs-link">建立虚拟用户文件</a></li>
+                <li><a href="#生成虚拟用户数据文件" class="tocs-link">生成虚拟用户数据文件</a></li>
+                <li><a href="#创建用户配置" class="tocs-link">创建用户配置</a></li>
+                <li><a href="#创建用户目录" class="tocs-link">创建用户目录</a></li>
+                <li><a href="#最后重启vsftpd服务器" class="tocs-link">最后重启vsftpd服务器</a></li>
+              </ol>
+            </li>
+            <li><a href="#服务运维" class="tocs-link">服务运维</a></li>
+            <li><a href="#ftp命令" class="tocs-link">FTP命令</a>
+              <ol class="tocs-list is-collapsed">
+                <li><a href="#关闭ftp连接" class="tocs-link">关闭FTP连接</a></li>
+                <li><a href="#下载文件" class="tocs-link">下载文件</a></li>
+                <li><a href="#上传文件" class="tocs-link">上传文件</a></li>
+              </ol>
+            </li>
+            <li><a href="#状态码" class="tocs-link">状态码</a></li>
+            <li><a href="#参考资料" class="tocs-link">参考资料</a></li>
+          </ol>
+        </aside>
+      </nav>
+    </div>
+    <script src="../js/demo-preview.js?v=1.21.9"></script>
+    <div class="footer warpper">Released under the MIT License. Copyright © 2022 Kenny Wong<br>Generated by <a href="https://github.com/jaywcjlove/idoc" target="_blank">idoc</a> v1.21.9</div>
+    <script src="../js/tocbot.js?v=1.21.9"></script>
+  </body>
+</html>
